@@ -4,7 +4,7 @@ import random
 
 class Barcode(object):
 
-    """docstring for ClassName"""
+    """plot a DNA sequence."""
 
     def __init__(self, seq):
         self.seq = seq
