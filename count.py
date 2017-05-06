@@ -63,7 +63,7 @@ with open(r"D:/PY sumbline coding/count.csv", "a", encoding="utf-8") as cf:
 # visualize these data
 data=pd.read_csv('count.csv').T
 data.columns=["F1","F2","F3","F4","F5"]
-pd.plot.bar()
+data.plot.bar(rot=0)
 plt.xlabel=("Length of miRNA")
 plt.ylabel=("Frequency of Diffrent miRNA")
 plt.title("the Number of Various Length of miRNA")
