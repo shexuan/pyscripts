@@ -14,8 +14,8 @@ import argparse
 def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
     stat = defaultdict(int)
     with open(fastq_in) as f_in, open(fastq_out,'w') as f_out:
-        while True:
-            if sys.version_info > (3,):
+        try:
+            while True:
                 seq_id = next(f_in)
                 seq = next(f_in)
                 plus = next(f_in)
@@ -34,7 +34,8 @@ def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
                     f_out.write(quality)
                     stat['clean_reads'] += 1
                     stat['clean_base'] += len(seq.strip())
-    
+        except StopIteration:
+            print('over')
     with open(stat,'w') as f:
         f.write('raw reads \t\t{}'.format(stat['raw_reads']))
         f.write('raw base \t\t{}'.format(stat['raw_base']))
