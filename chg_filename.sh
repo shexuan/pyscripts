@@ -21,5 +21,3 @@ else
         mv $file $new_name
     done
 fi
-    
-
