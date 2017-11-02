@@ -11,7 +11,7 @@ import sys, os
 from collections import defaultdict
 import argparse
 
-def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
+def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, statistic):
     stat = defaultdict(int)
     with open(fastq_in) as f_in, open(fastq_out,'w') as f_out:
         try:
@@ -38,7 +38,7 @@ def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
                     stat['clean_base'] += len(seq.strip())
         except StopIteration:
             print('over')
-    with open(stat,'w') as f:
+    with open(statistic,'w') as f:
         f.write('raw reads \t\t{}\n'.format(stat['raw_reads']))
         f.write('raw base \t\t{}\n'.format(stat['raw_base']))
         f.write('clean reads \t\t{}\n'.format(stat['clean_reads']))
@@ -62,9 +62,9 @@ if __name__=='__main__':
     N_prop = args['N']
     floor_quality = args['q']
     filter_limit = args['prop']
-    stat = args['stat']
+    statistic = args['stat']
     
-    qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat)
+    qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, statistic)
 
 
 
