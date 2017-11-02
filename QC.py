@@ -37,11 +37,11 @@ def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
         except StopIteration:
             print('over')
     with open(stat,'w') as f:
-        f.write('raw reads \t\t{}'.format(stat['raw_reads']))
-        f.write('raw base \t\t{}'.format(stat['raw_base']))
-        f.write('clean reads \t\t{}'.format(stat['clean_reads']))
-        f.write('clean base \t\t{}'.format(stat['clean_base']))
-        f.write('N proportion \t\t{}'.format(stat['N']/stat['raw_base']))
+        f.write('raw reads \t\t{}\n'.format(stat['raw_reads']))
+        f.write('raw base \t\t{}\n'.format(stat['raw_base']))
+        f.write('clean reads \t\t{}\n'.format(stat['clean_reads']))
+        f.write('clean base \t\t{}\n'.format(stat['clean_base']))
+        f.write('N proportion \t\t{}\n'.format(stat['N']/stat['raw_base']))
         f.write('clean reads proportion \t\t{}'.format(stat['clean_reads']/stat['raw_reads']))
 
 if __name__=='__main__':
