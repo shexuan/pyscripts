@@ -32,6 +32,8 @@ def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
                     f_out.write(seq)
                     f_out.write(plus)
                     f_out.write(quality)
+                    stat['G'] += seq.count('G')
+                    stat['C'] += seq.count('C')
                     stat['clean_reads'] += 1
                     stat['clean_base'] += len(seq.strip())
         except StopIteration:
@@ -42,7 +44,8 @@ def qc(fastq_in, fastq_out, N_prop, floor_quality, filter_limit, stat):
         f.write('clean reads \t\t{}\n'.format(stat['clean_reads']))
         f.write('clean base \t\t{}\n'.format(stat['clean_base']))
         f.write('N proportion \t\t{}\n'.format(stat['N']/stat['raw_base']))
-        f.write('clean reads proportion \t\t{}'.format(stat['clean_reads']/stat['raw_reads']))
+        f.write('clean reads proportion \t\t{}\n'.format(stat['clean_reads']/stat['raw_reads']))
+        f.write('GC content \t\t{}'.format((stat['G']+stat['C'])/stat['clean_base']))
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
