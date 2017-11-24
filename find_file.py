@@ -53,24 +53,3 @@ if __name__ == '__main__':
     file = 'notes.py'
     res = findFile2(path, file)
     print(res)
-
-
-# def findFile2(path, file):
-#     '''To implent the simple functions like linux command -- find.'''
-#     # Breadth  First Search
-#     dirs = deque()
-#     with os.scandir(path) as entryDir:
-#         for entry in entryDir:
-#             if entry.is_file(follow_symlinks=True) and entry.name == file:
-#                 return entry.path
-#             if entry.is_dir(follow_symlinks=True):
-#                 if entry.name == file:
-#                     return entry.path
-#                 dirs.append(entry.path)
-#     while True:
-#         try:
-#             dir_ = dirs.popleft()
-#             # print(dir_)
-#             return findFile2(dir_, file)
-#         except IndexError:
-#             break
