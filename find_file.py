@@ -46,8 +46,6 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--path', type=str, help='the root directory to find file.')
     parser.add_argument('-f', '--file', type=str, help='the file or dir to find.')
     args = vars(parser.parse_args())
-    # path = args['path']
-    # file = args['file']
 
     path = 'D:\sublime_coding'
     file = 'notes.py'
