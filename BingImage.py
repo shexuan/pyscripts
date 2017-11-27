@@ -37,6 +37,8 @@ class BingImages(object):
             with open("{0}\{1}.{2}".format(self.img_dir, img_name, img_type), "wb") as f:
                 f.write(res.content)
         print('over')
+
+
 if __name__ == "__main__":
     img = BingImages()
     img.downloadImage()
