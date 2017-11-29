@@ -24,6 +24,8 @@ def extractSeq(id_file, fasta, result):
                     flag = 1
                     n += 1
                     del id_dict[line[1:]]
+                else:
+                    flag = 0
             else:
                 if flag == 1:
                     res.write(line)
