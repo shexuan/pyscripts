@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+'''
+Usage:
+    python extract_seq.py -id id_file -fa fasta -o output
+'''
+
+
 import argparse
 
 
