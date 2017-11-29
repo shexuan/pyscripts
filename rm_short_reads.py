@@ -17,13 +17,10 @@ def rmShort(in_file, out_file, length):
         for line in f_in:
             if line.startswith('>'):
                 try:  # 在读取后一条序列的时候处理前一条序列，所以刚刚读取第一行的时候会报错
-                    for seq_id, seq in cunt.items():
-                        if len(seq) < length:
-                            del cunt[seq_id]
-                        else:
-                            f_out.write(seq_id)
-                            f_out.write(seq)
-                            del cunt[seq_id]
+                    seq = cunt.pop(id_)
+                    if len(seq) > length:
+                        f_out.write(id_)
+                        f_out.write(seq)
                 except:
                     pass
                 finally:
