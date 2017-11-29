@@ -8,28 +8,35 @@ Usage:
 '''
 
 import argparse
+from collections import defaultdict
+
 
 def rmShort(in_file, out_file, length):
-    out = open(out_file,'w')
-    cunt = defaultdict(int)
-    total_len = 0
-    with open(in_file) as f_in, open(out_file) as f_out:
+    cunt = defaultdict(str)
+    with open(in_file) as f_in, open(out_file, 'w') as f_out:
         for line in f_in:
             if line.startswith('>'):
-                try:
-                    if len(seq) >= length:
-                        f_out.write(seq_id)
-                        f_out.write(seq)
+                try:  # 在读取后一条序列的时候处理前一条序列，所以刚刚读取第一行的时候会报错
+                    for seq_id, seq in cunt.items():
+                        if len(seq) < length:
+                            del cunt[seq_id]
+                        else:
+                            f_out.write(seq_id)
+                            f_out.write(seq)
+                            del cunt[seq_id]
                 except:
                     pass
                 finally:
-                    seq_id = line
-                    seq = ''
-            else: 
-                seq += line # 一条序列有多行
+                    id_ = line
+            else:
+                cunt[id_] += line
+        for seq_id, seq in cunt.items():  # 对于最后一行，无法读取其后一行时处理它，故拿出来专门处理
+            if len(seq) > length:
+                f_out.write(seq_id)
+                f_out.write(seq)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', type=str, help='Input fasta file')
     parser.add_argument('-o', type=str, help='Output the filtered reads')
