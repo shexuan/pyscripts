@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 # coding:utf-8
 
+'''
+Extract gene seq from ref.fa according to the gff. 
+Usage:
+    python3 extract_gff_region.py gff ref.fa out
+'''
+
 from collections import defaultdict
-import sys
+import argparse
 
 
 def extractRegion(gff, fasta, out):
@@ -49,7 +55,13 @@ def extractRegion(gff, fasta, out):
     print('over')
 
 if __name__ == '__main__':
-    gff = sys.argv[1]
-    fasta = sys.argv[2]
-    out = sys.argv[3]
+    parser = argparse.ArgumentParser(description='Extract gene seq from ref.fa according to the gff')
+    parser.add_argument('-gff', type=str, help='Input the gff file')
+    parser.add_argument('-out', '-o' type=str, help='Output gene and sequence')
+    parser.add_argument('-fa', '--fasta', type=float, default=0.5, help='reference genome file')
+    args = vars(parser.parse_args())
+
+    gff = args['gff']
+    fasta = args['fasta']
+    out = args['out']
     extractRegion(gff, fasta, out)
