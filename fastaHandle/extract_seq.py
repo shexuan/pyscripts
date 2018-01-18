@@ -4,6 +4,13 @@
 '''
 Usage:
     python extract_seq.py -id id_file -fa fasta -o output
+
+
+Also, extract seq with one line awk:
+for one seq:
+    awk 'BEGIN{RS=">"}/id/{print ">"$0}' fasta
+from seq_id file:
+    cat id_file | while read id; do (awk 'BEGIN{RS=">"}/$id/{print ">"$0}' >> res.fa); done
 '''
 
 
