@@ -485,7 +485,10 @@ arr = [[75],
 
 
 # Problem 19
-#
+# Counting Sundays
+import pandas as pd
+df = pd.date_range('1901-01-01', '2000-12-31', freq="W-SUN")
+print(list(df.day).count(1))
 
 
 # Problem 27
