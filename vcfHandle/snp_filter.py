@@ -5,6 +5,9 @@
 Filtering snp with density and Kmeans cluster.
 '''
 
+# 注： 如果报错，把kmeans_filtered()函数中的R脚本路径换成正确的绝对路径
+
+
 from collections import OrderedDict, defaultdict, Counter
 import os
 import sys
@@ -76,15 +79,15 @@ def split_info(density_filtered):
                 res.write(info_s + '\n')
 
 
-def kmeans_filter(raw_vcf, wd):
+def kmeans_filter(raw_vcf):
     '''
     split all snp into two classes -- homo and hete. 
     And then clustering with Kmeans in R respectively. 
     Filtering the fake snp with the result of cluster.
     Finally merge them all.
     '''
-    os.system('Rscript kmeans_cluster.r tmp2.vcf {}'.format(wd))
-    with open('density.k2.vcf', 'w') as res, open('kmeans.filtered.vcf') as f, open(raw_vcf) as raw:
+    os.system('Rscript /home/sxuan/dch/test/kmeans_cluster.r tmp2.vcf')
+    with open('density.k2.filtered.vcf', 'w') as res, open('kmeans.filtered.vcf') as f, open(raw_vcf) as raw:
         for line in raw:
             if line.startswith('#'):
                 res.write(line)
@@ -92,12 +95,12 @@ def kmeans_filter(raw_vcf, wd):
                 break
         for line in f:
             res.write(line)
-   # os.remove('tmp1.vcf')
-    # os.remove('tmp2.vcf')
-    # os.remove('kmeans.filtered.vcf')
+    os.remove('tmp1.vcf')
+    os.remove('tmp2.vcf')
+    os.remove('kmeans.filtered.vcf')
 
 
-def main(raw_vcf, wd):
+def main(raw_vcf):
     filter_snp(raw_vcf)
     density_filtered = 'tmp1.vcf'
     split_info(density_filtered)
@@ -109,10 +112,9 @@ if __name__ == '__main__':
     # parser.add_argument("--in", "-i", type="str", help="raw input vcf file.")
     # args = vars(parser.parse_args())
     # raw_vcf = args["in"]
-    pwd = os.getcwd()
     arg = sys.argv[1]
     if arg in ['-h', '--help']:
         print("Usage:\tpython snp_filter.py raw.vcf")
     else:
-        main(arg, wd=pwd)
+        main(arg)
         print('over')
