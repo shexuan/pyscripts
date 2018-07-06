@@ -22,6 +22,7 @@ def fibonacci(n):
             yield a
         a, b = a+b, a
 
+
 l = sum(i for i in fibonacci(10000*400))
 # print(l)
 
@@ -424,7 +425,8 @@ def factorial(n):
     else:
         return n*factorial(n-1)
 
-print(factorial(40)//factorial(20)**2)
+
+# print(factorial(40)//factorial(20)**2)
 
 
 # Problem 16
@@ -465,6 +467,7 @@ def maxPathSum(arr):
     arr.pop()
     return maxSum(arr)
 
+
 arr = [[75],
        [95, 64],
        [17, 47, 82],
@@ -488,11 +491,44 @@ arr = [[75],
 # Counting Sundays
 import pandas as pd
 df = pd.date_range('1901-01-01', '2000-12-31', freq="W-SUN")
-print(list(df.day).count(1))
+# print(list(df.day).count(1))
 
+
+# Problem 20
+# Factorial digit sum
+def factorial(n):
+    if n < 2:
+        return 1
+    else:
+        return n*factorial(n-1)
+
+
+print(sum(int(i) for i in str(factorial(100))))
+
+
+# Problem 22
+# Names scores
+import string
+
+
+def total_score(file):
+    letters = string.ascii_uppercase
+    char2score = {char: score for score, char in enumerate(letters, 1)}
+    total = 0
+    with open(file) as f:
+        names = sorted(f.read().strip().split(','))
+        name2score = {pos: list(eval(name)) for pos, name in enumerate(names, 1)}
+        for pos, name in name2score.items():
+            total += pos*(sum(char2score[char] for char in name if char))
+    return total
+
+
+# print(total_score(r'C:\Users\sxuan\Desktop\names.txt'))
 
 # Problem 27
 # Quadratic primes
+
+
 def isPrime(n):
     import math
     if n < 2:
