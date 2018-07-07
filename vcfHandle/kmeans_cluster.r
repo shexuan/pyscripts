@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 # coding:utf-8
 
-library('dplyr')
-library('stats')
+suppressMessages(library('dplyr'))
+suppressMessages(library('stats'))
 
 args <- commandArgs()
 file <- args[6]
