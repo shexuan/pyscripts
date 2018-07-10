@@ -80,15 +80,15 @@ def split_info(density_filtered):
                 res.write(info_s + '\n')
 
 
-def kmeans_filter(raw_vcf):
+def cluster_filter(raw_vcf, algorithm):
     '''
     split all snp into two classes -- homo and hete. 
     And then clustering with Kmeans in R respectively. 
     Filtering the fake snp with the result of cluster.
     Finally merge them all.
     '''
-    os.system('Rscript /home/sxuan/dch/test/kmeans_cluster.r tmp2.vcf')
-    with open('density.k2.filtered.vcf', 'w') as res, open('kmeans.filtered.vcf') as f, open(raw_vcf) as raw:
+    os.system('Rscript /home/sxuan/dch/test/kmeans_cluster.r tmp2.vcf {}'.format(algorithm))
+    with open('density.cluster.filtered.vcf', 'w') as res, open('cluster.filtered.vcf') as f, open(raw_vcf) as raw:
         for line in raw:
             if line.startswith('#'):
                 res.write(line)
@@ -96,22 +96,26 @@ def kmeans_filter(raw_vcf):
                 break
         for line in f:
             res.write(line)
-    os.remove('tmp1.vcf')
-    os.remove('tmp2.vcf')
-    os.remove('kmeans.filtered.vcf')
+    # os.remove('tmp1.vcf')
+    # os.remove('tmp2.vcf')
+    # os.remove('kmeans.filtered.vcf')
 
 
-def main(raw_vcf):
+def main(raw_vcf, algorithm):
     filter_snp(raw_vcf)
     density_filtered = 'tmp1.vcf'
     split_info(density_filtered)
-    kmeans_filter(raw_vcf)
+    cluster_filter(raw_vcf, algorithm)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Filtering snp with density and Kmeans cluster.")
     parser.add_argument('--in', '-i', type=str, metavar='raw.vcf', help="raw input vcf file.")
+    parser.add_argument('--algorithm', '-a', type=str, metavar='algorithm', default='kmeans',
+                        choices=['gmm', 'kmeans'], help='cluster algorithm for filter variants. optional "gmm" or "kmeans".')
     args = vars(parser.parse_args())
 
+    algorithm = args['algorithm']
     raw_vcf = args['in']
-    main(raw_vcf)
+
+    main(raw_vcf, algorithm)
