@@ -13,7 +13,14 @@ file <- args[6]
 #######################################################
 # Method 2
 
+library('optparse')
 
+option_list <- list(
+    make_option(c('--file', '-f'), type='character', default=NULL, help='dataset file.', metavar='file')
+    make_option(c('--out', '-o'), type='character', default='out.txt', help='output file name', metavar='output')
+    )
 
+opt_parser <- OptionParser(option_list=option_list)
+opt <- parse_args(opt_parser) 
 
-
+file <- opt$file
