@@ -30,7 +30,8 @@ def filter_snp(raw_vcf, density_filtered="tmp1.vcf", step=200, limit=5):
             if line.startswith('#'):
                 res.write(line)
             else:
-                all_pos.setdefault(line.split('\t')[0], []).append(int(line.split('\t')[1]))
+                all_pos.setdefault(line.split('\t')[0], []).append(
+                    int(line.split('\t')[1]))
     for chr_, pos in all_pos.items():
         # 生成所有step区间
         start = pos[0]
@@ -43,7 +44,8 @@ def filter_snp(raw_vcf, density_filtered="tmp1.vcf", step=200, limit=5):
         distribution = [bisect(intervals, p) for p in pos]
         density = Counter(distribution)
         # interval 表示掉落在第几个区间，number表示掉落在这个区间的snp数量
-        filtered_snp = [interval for interval, number in density.items() if number <= limit]
+        filtered_snp = [interval for interval,
+                        number in density.items() if number <= limit]
         # distribution -> 所有snp位点的分布， filtered_snp -> 密度小于5的snp位点
         filter_dict[chr_] = (distribution, filtered_snp)
     raw_dict = OrderedDict()
@@ -63,8 +65,10 @@ def split_info(density_filtered):
     split the INFO column into 15 cols, and filtered some snp without "major info".
     whereafter clustered by Kmeans in R.
     '''
-    INFO = ['AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet', 'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
-    header = '\t'.join((['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'son']+INFO))
+    INFO = ['AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet',
+            'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
+    header = '\t'.join((['CHROM', 'POS', 'ID', 'REF', 'ALT',
+                         'QUAL', 'FILTER', 'INFO', 'FORMAT', 'son']+INFO))
     major_info = ['FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     with open(density_filtered) as f, open('tmp2.vcf', 'w') as res:
         res.write(header+'\n')
@@ -87,7 +91,8 @@ def cluster_filter(raw_vcf, algorithm):
     Filtering the fake snp with the result of cluster.
     Finally merge them all.
     '''
-    os.system('Rscript /home/sxuan/dch/test/kmeans_cluster.r tmp2.vcf {}'.format(algorithm))
+    os.system(
+        'Rscript /home/sxuan/dch/test/cluster_filtered.r tmp2.vcf {}'.format(algorithm))
     with open('density.cluster.filtered.vcf', 'w') as res, open('cluster.filtered.vcf') as f, open(raw_vcf) as raw:
         for line in raw:
             if line.startswith('#'):
@@ -109,8 +114,10 @@ def main(raw_vcf, algorithm):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Filtering snp with density and Kmeans cluster.")
-    parser.add_argument('--in', '-i', type=str, metavar='raw.vcf', help="raw input vcf file.")
+    parser = argparse.ArgumentParser(
+        description="Filtering snp with density and Kmeans cluster or GMM.")
+    parser.add_argument('--in', '-i', type=str,
+                        metavar='raw.vcf', help="raw input vcf file.")
     parser.add_argument('--algorithm', '-a', type=str, metavar='algorithm', default='kmeans',
                         choices=['gmm', 'kmeans'], help='cluster algorithm for filter variants. optional "gmm" or "kmeans".')
     args = vars(parser.parse_args())
