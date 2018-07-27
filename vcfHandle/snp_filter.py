@@ -103,7 +103,7 @@ def cluster_filter(raw_vcf, algorithm):
             res.write(line)
     # os.remove('tmp1.vcf')
     # os.remove('tmp2.vcf')
-    # os.remove('kmeans.filtered.vcf')
+    # os.remove('cluster.filtered.vcf')
 
 
 def main(raw_vcf, algorithm):
@@ -115,7 +115,7 @@ def main(raw_vcf, algorithm):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Filtering snp with density and Kmeans cluster or GMM.")
+        description="Filtering snp with density and Kmeans cluster OR gmm.")
     parser.add_argument('--in', '-i', type=str,
                         metavar='raw.vcf', help="raw input vcf file.")
     parser.add_argument('--algorithm', '-a', type=str, metavar='algorithm', default='kmeans',
