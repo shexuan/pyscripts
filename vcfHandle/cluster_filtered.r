@@ -11,7 +11,10 @@ file <- args[6]
 method <- args[7]
 #file <- 'tmp2.cvf'
 
-vcf <- read.csv(file,sep='\t',stringsAsFactors=F)
+
+cols <- c('CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE', 'AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet', 'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR', 'SAMPLE')
+#vcf <- read.csv(file,sep='\t',stringsAsFactors=F,header=T,col.names=cols)
+vcf <- read.csv(file,stringsAsFactors = F,header = F,sep='\t',col.names=cols ,skip = 1)
 vcf.no.NA <- dplyr::filter(vcf, FS!='NA' & 
                              MQ!='NA' &
                              MQRankSum!='NA' &
@@ -20,8 +23,8 @@ vcf.no.NA <- dplyr::filter(vcf, FS!='NA' &
                              SOR!='NA')
 
 # split the vcf to two dataframe, hete and homo according to columns AF
-vcf.no.NA.homo <- vcf.no.NA[vcf.no.NA$AF=='1.00',]
-vcf.no.NA.hete <- vcf.no.NA[vcf.no.NA$AF=='0.500',]
+vcf.no.NA.homo <- vcf.no.NA[vcf.no.NA$AF=='1',]
+vcf.no.NA.hete <- vcf.no.NA[vcf.no.NA$AF=='0.5',]
 
 # columns used for feature vectors 
 major.info <- c('FS','MQ','MQRankSum','QD','ReadPosRankSum','SOR')
@@ -45,7 +48,7 @@ if (method=='gmm'){
   gmm.hete <- Mclust(vcf.no.NA.hete[major.info], G=2)
   
   cls.homo <- as.vector(gmm.homo$classification)
-  cls.hete <- as.vector(gmm.homo$classification)
+  cls.hete <- as.vector(gmm.hete$classification)
   vcf.no.NA.hete$cluster <- cls.hete
   vcf.no.NA.homo$cluster <- cls.homo
   
@@ -59,9 +62,13 @@ vcf.no.NA.homo.filter <- vcf.no.NA.homo[vcf.no.NA.homo$cluster==positive.homo,]
 vcf.no.NA.hete.filter <- vcf.no.NA.hete[vcf.no.NA.hete$cluster==positive.hete,]
 
 
-# merge hete and homo into a dataframe
+# merge hete and homo into a dataframe and sort all variants by chrom and pos
 vcf.filtered.merge <- rbind(vcf.no.NA.hete.filter,vcf.no.NA.homo.filter)
-write.table(vcf.filtered.merge[seq(1,10)], file='cluster.filtered.vcf', sep='\t',row.names = F, col.names = F, quote = F)
+Chr <- c(paste('chr', seq(1,22), sep=''), c('chrX','chrY'))
+vcf.filtered.merge.sort <- data.frame()
+for (chr_ in Chr){
+  chr.sort <- arrange(vcf.filtered.merge[vcf.filtered.merge$CHROM==chr_,], POS)
+  vcf.filtered.merge.sort <- rbind(vcf.filtered.merge.sort, chr.sort)  
+} 
 
-
-
+write.table(vcf.filtered.merge.sort[seq(1,10)], file='cluster.filtered.vcf', sep='\t', row.names=F,col.names=F, quote=F)
