@@ -68,8 +68,8 @@ def split_info(density_filtered):
     INFO = ['AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet',
             'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     header = '\t'.join((['CHROM', 'POS', 'ID', 'REF', 'ALT',
-                         'QUAL', 'FILTER', 'INFO', 'FORMAT', 'son']+INFO))
-    major_info = ['FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
+                         'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE']+INFO))
+    # major_info = ['FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     with open(density_filtered) as f, open('tmp2.vcf', 'w') as res:
         res.write(header+'\n')
         for line in f:
@@ -84,7 +84,7 @@ def split_info(density_filtered):
                 res.write(info_s + '\n')
 
 
-def cluster_filter(raw_vcf, algorithm):
+def cluster_filter(raw_vcf, algorithm, outdir):
     '''
     split all snp into two classes -- homo and hete. 
     And then clustering with Kmeans in R respectively. 
@@ -93,7 +93,7 @@ def cluster_filter(raw_vcf, algorithm):
     '''
     os.system(
         'Rscript /home/sxuan/dch/test/cluster_filtered.r tmp2.vcf {}'.format(algorithm))
-    with open('density.cluster.filtered.vcf', 'w') as res, open('cluster.filtered.vcf') as f, open(raw_vcf) as raw:
+    with open(outdir+'/density.'+algorithm+'.filtered.vcf', 'w') as res, open('cluster.filtered.vcf') as f, open(raw_vcf) as raw:
         for line in raw:
             if line.startswith('#'):
                 res.write(line)
@@ -101,28 +101,31 @@ def cluster_filter(raw_vcf, algorithm):
                 break
         for line in f:
             res.write(line)
-    # os.remove('tmp1.vcf')
-    # os.remove('tmp2.vcf')
-    # os.remove('cluster.filtered.vcf')
+    os.remove('tmp1.vcf')   # density filtered
+    os.remove('tmp2.vcf')   # the file split INFO
+    os.remove('cluster.filtered.vcf')  # clustered filtered
 
 
 def main(raw_vcf, algorithm):
     filter_snp(raw_vcf)
     density_filtered = 'tmp1.vcf'
     split_info(density_filtered)
-    cluster_filter(raw_vcf, algorithm)
+    cluster_filter(raw_vcf, algorithm, outdir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Filtering snp with density and Kmeans cluster OR gmm.")
+        description="Filtering snp with density and Kmeans cluster.")
     parser.add_argument('--in', '-i', type=str,
                         metavar='raw.vcf', help="raw input vcf file.")
     parser.add_argument('--algorithm', '-a', type=str, metavar='algorithm', default='kmeans',
                         choices=['gmm', 'kmeans'], help='cluster algorithm for filter variants. optional "gmm" or "kmeans".')
+    parser.add_argument('--outdir', '-o', default='.', metavar='outdir', help='Output directory')
     args = vars(parser.parse_args())
 
     algorithm = args['algorithm']
     raw_vcf = args['in']
-
+    outdir = args['outdir']
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
     main(raw_vcf, algorithm)
