@@ -49,7 +49,7 @@ class BingImages(object):
             res.encoding = "utf-8"
             img_name = (url.split('/')[-1]).split('_')[0]
             img_type = url.split('.')[-1]
-            with open("{0}\{1}.{2}".format(self.img_dir, img_name, img_type), "wb") as f:
+            with open(r"{0}\{1}.{2}".format(self.img_dir, img_name, img_type), "wb") as f:
                 f.write(res.content)
 
 
