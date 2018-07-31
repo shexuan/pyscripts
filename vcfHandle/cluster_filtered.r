@@ -12,8 +12,8 @@ method <- args[7]
 #file <- 'tmp2.cvf'
 
 
-cols <- c('CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE', 'AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet', 'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR', 'SAMPLE')
-#vcf <- read.csv(file,sep='\t',stringsAsFactors=F,header=T,col.names=cols)
+cols <- c('CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE', 'AC', 'AF', 'AN', 
+          'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet', 'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR', 'SAMPLE')
 vcf <- read.csv(file,stringsAsFactors = F,header = F,sep='\t',col.names=cols ,skip = 1)
 vcf.no.NA <- dplyr::filter(vcf, FS!='NA' & 
                              MQ!='NA' &
