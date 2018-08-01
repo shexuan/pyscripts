@@ -9,11 +9,11 @@ from collections import OrderedDict
 import sys
 
 
-def split_info(vcf):
+def split_info(raw_vcf):
     INFO = ['AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'ExcessHet',
             'FS', 'MLEAC', 'MLEAF', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     header = '\t'.join((['CHROM', 'POS']+INFO))
-    with open(vcf, 'r', encoding='utf-8') as f, open(vcf+'.info', 'w', encoding='utf-8') as res:
+    with open(raw_vcf, 'r', encoding='utf-8') as f, open(raw_vcf+'.info', 'w', encoding='utf-8') as res:
         res.write(header+'\n')
         for line in f:
             if not line.startswith('#'):
@@ -28,7 +28,7 @@ def split_info(vcf):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
+    if sys.argv[1] in ['-h', '--help']:
         print('Usage:\tpython3 split_info VCF.file')
     else:
         split_info(sys.argv[1])
