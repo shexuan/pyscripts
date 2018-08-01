@@ -34,14 +34,12 @@ def anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf):
     annotating dbsnp BuildID.
     '''
     vcf = pd.read_csv(info_vcf, header=0, sep='\t')
-    cols = ['CHROM', 'POS', 'FS', 'MQ',
-            'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
+    cols = ['CHROM', 'POS', 'FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     vcf = vcf.loc[:, cols]
     dbsnp = pd.read_csv(dbsnp_ID, header=0, sep='\t')
     dbsnp = dbsnp.loc[:, ('CHROM', 'POS', 'BuildID')]
     # annotate dbsnp BuildID
-    vcf_snpID = pd.merge(left=vcf, right=dbsnp,
-                         how='left', on=['CHROM', 'POS'])
+    vcf_snpID = pd.merge(left=vcf, right=dbsnp, how='left', on=['CHROM', 'POS'])
     # drop duplicated annotated dbsnp ID
     vcf_snpID = vcf_snpID.drop_duplicated(['CHROM', 'POS'])
     # drop un-annotated snp
@@ -58,11 +56,9 @@ def anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table):
     '''
     vcf_identified = pd.read_csv(
         identified_vcf, header=None, comment='#', sep='\t', usecols=(0, 1, 3))
-    vcf_anno_identified = pd.merge(
-        anno_snpID_vcf, identified_vcf, how='left', on=['CHROM', 'POS'])
+    vcf_anno_identified = pd.merge(anno_snpID_vcf, identified_vcf, how='left', on=['CHROM', 'POS'])
     # mapping matched pos as 1 else 0
-    vcf_anno_identified['CLASS'] = vcf_anno_identified['ALT'].apply(
-        lambda x: int(1) if isinstance(x, str) else int(0))
+    vcf_anno_identified['CLASS'] = vcf_anno_identified['ALT'].apply(lambda x: int(1) if isinstance(x, str) else int(0))
     array = (vcf_anno_identified.drop(['CHROM', 'POS', 'ALT'], axis=1))
     # keep 3 digits after the decimal point
     array = array.round(3)
@@ -76,14 +72,10 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Cleanning raw VCF data.")
-    parser.add_argument("--raw_vcf", "-r", type="str",
-                        help="Input the Raw VCF file.")
-    parser.add_argument("--dbsnpID", "-db", type="str",
-                        help="Input the dbsnp file.")
-    parser.add_argument("--identified_vcf", "-i", type="str",
-                        help="Input the identified high confidence VCF file.")
-    parser.add_argument('--feature_prefix', '-prefix', type='str',
-                        help='The output feature table NAME PREFIX of the raw vcf file')
+    parser.add_argument("--raw_vcf", "-r", type="str", help="Input the Raw VCF file.")
+    parser.add_argument("--dbsnpID", "-db", type="str", help="Input the dbsnp file.")
+    parser.add_argument("--identified_vcf", "-i", type="str", help="Input the identified high confidence VCF file.")
+    parser.add_argument('--feature_prefix', '-prefix', type='str', help='The output feature table NAME PREFIX of the raw vcf file, Sample ID recommanded. ')
     args = vars(parser.parse_args())
 
     # splitted INFO columns and write to tmp1.info.vcf
