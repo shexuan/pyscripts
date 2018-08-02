@@ -92,7 +92,7 @@ def cluster_filter(raw_vcf, algorithm, outdir):
     Finally merge them all.
     '''
     os.system(
-        'Rscript /home/sxuan/dch/test/cluster_filtered.r tmp2.vcf {}'.format(algorithm))
+        'Rscript /home/sxuan/pyscripts/vcfHandle/cluster_filtered.r tmp2.vcf {}'.format(algorithm))
     with open(outdir+'/density.'+algorithm+'.filtered.vcf', 'w') as res, open('cluster.filtered.vcf') as f, open(raw_vcf) as raw:
         for line in raw:
             if line.startswith('#'):

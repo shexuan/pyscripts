@@ -7,6 +7,20 @@ import numpy as np
 import argparse
 
 
+class Algorithm(object):
+    def __init__(self, *args):
+        pass
+
+    def MLPClassifier(self, *args):
+        pass
+
+    def KNN(self, *args):
+        pass
+
+    def Kmeans(self, *args):
+        pass
+
+
 def split_info(raw_vcf, info_vcf):
     '''
     split vcf INFO column and extract infos.
@@ -75,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument("--raw_vcf", "-r", type="str", help="Input the Raw VCF file.")
     parser.add_argument("--dbsnpID", "-db", type="str", help="Input the dbsnp file.")
     parser.add_argument("--identified_vcf", "-i", type="str", help="Input the identified high confidence VCF file.")
-    parser.add_argument('--feature_prefix', '-prefix', type='str', help='The output feature table NAME PREFIX of the raw vcf file, Sample ID recommanded. ')
+    parser.add_argument('--feature_prefix', '-prefix', type='str', help='The output feature table NAME PREFIX of the raw vcf file, Sample ID recommanded.')
     args = vars(parser.parse_args())
 
     # splitted INFO columns and write to tmp1.info.vcf
