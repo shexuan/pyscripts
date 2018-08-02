@@ -132,24 +132,37 @@ def anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table):
     vcf_snpID = pd.read_csv(anno_snpID_vcf, sep='\t', header=0)
     # drop duplicated annotated dbsnp ID
     vcf_snpID_rmdup = vcf_snpID.drop_duplicates(['CHROM', 'POS'], keep='first')
-    # drop un-annotated snp
-    vcf_snpID_rmdup_rmUnannoID = vcf_snpID_rmdup.dropna(subset=['BuildID'])
-    # fill NA with 0. in col MQRankSum and ReadPosRankSum
-    vcf_snpID_rmdup_rmUnannoID_fillna = vcf_snpID_rmdup_rmUnannoID.fillna(0.)
-    vcf_anno_identified = pd.merge(vcf_snpID_rmdup_rmUnannoID_fillna, vcf_identified,
+    cols = list(vcf_snpID_rmdup.columns)
+    BD_idx = cols.index('BuildID')
+    # if annotate dbsnp BuildID=1.0 else 0.
+    array = vcf_snpID_rmdup.values
+    array[:, BD_idx][array[:, BD_idx] > 0] = 1.0
+    vcf_snpID_rmdup_unifyID = pd.DataFrame(array, columns=cols)
+    # fill NA with 0. in col MQRankSum, ReadPosRankSum and BuildID
+    vcf_snpID_rmdup_unifyID_fillna = vcf_snpID_rmdup_unifyID.fillna(0.)
+    vcf_anno_identified = pd.merge(vcf_snpID_rmdup_unifyID_fillna, vcf_identified,
                                    how='left', on=['CHROM', 'POS'])
     # mapping matched pos as 1 else 0
     vcf_anno_identified['CLASS'] = vcf_anno_identified['ALT'].apply(
         lambda x: int(1) if isinstance(x, str) else int(0))
-    array = (vcf_anno_identified.drop(['CHROM', 'POS', 'ALT'], axis=1))
+    array = vcf_anno_identified.drop(['ALT'], axis=1)
     # keep 3 digits after the decimal point
     array = array.round(3)
     array.to_csv(feature_table, sep='\t', encoding='utf-8', index=0)
 
 
 @timethis
-def stat(raw_vcf, anno_dbsnpID, anno_TP_FP):
-    vcf_raw = pd.read_csv(raw_vcf, sep='t', header=None, comment='#')
+def stat(raw_vcf, anno_dbsnpID, anno_TP_FP, dens_filter):
+    vcf_raw = pd.read_csv(raw_vcf, sep='\t', header=None, comment='#')
+    vcf_identified = pd.read_csv(identified_vcf, sep='\t', header=None, usecols=(0, 1),
+                                 names=['CHROM', 'POS'])
+    if dens_filter == 'T':
+        vcf_dens_filtered = pd.read_csv(density_filtered_vcf, sep='\t', header=None,
+                                        names=['CHROM', 'POS'], usecols=(0, 1))
+        num_density_filtered = pd.merge(vcf_dens_filtered, vcf_identified,
+                                        how='inner', on=['CHROM', 'POS'])
+        print('Density filter Number:t{}'.format(
+            len(vcf_raw)-len(vcf_dens_filtered)))
 
 
 @timethis
@@ -165,7 +178,7 @@ def rm_tmp(rm, *tmpfiles):
 @timethis
 def main():
     if dens_filter == 'T':
-        density_filter(raw_vcf, density_filtered_vcf, step=200, limit=5)
+        density_filter(raw_vcf, density_filtered_vcf)
         split_info(density_filtered_vcf, info_vcf)
         anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf)
         anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table)
@@ -190,7 +203,7 @@ if __name__ == '__main__':
                         help="Input the identified high confidence VCF file.")
     parser.add_argument('--feature_prefix', '-pref', type=str,
                         help='The output feature table NAME PREFIX of the raw vcf file, Sample ID recommanded. ')
-    parser.add_argument("--remove", "-rm", type=str, choices=['T', 'F'], default='T',
+    parser.add_argument("--remove", "-rm", type=str, choices=['T', 'F'], default='F',
                         help="Remove the TEMP intermediate file or NOT. Default Remove.")
     parser.add_argument("--density_filter", "-df", type=str, choices=['T', 'F'], default='F',
                         help="Input the Raw VCF file. Default NOT execute density filtering.")
