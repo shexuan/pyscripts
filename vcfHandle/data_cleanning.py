@@ -161,8 +161,7 @@ def stat(raw_vcf, anno_dbsnpID, anno_TP_FP, dens_filter):
                                         names=['CHROM', 'POS'], usecols=(0, 1))
         num_density_filtered = pd.merge(vcf_dens_filtered, vcf_identified,
                                         how='inner', on=['CHROM', 'POS'])
-        print('Density filter Number:t{}'.format(
-            len(vcf_raw)-len(vcf_dens_filtered)))
+        print('Density filter Number:t{}'.format(len(vcf_raw)-len(vcf_dens_filtered)))
 
 
 @timethis
