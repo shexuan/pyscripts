@@ -43,8 +43,7 @@ def density_filter(raw_vcf, density_filtered_vcf, step=200, limit=5):
     all_pos = OrderedDict()
     filter_dict = OrderedDict()
     with open(raw_vcf, 'r', encoding='utf-8') as f, open(density_filtered_vcf, 'wt', encoding='utf-8') as res:
-        res.write('##FILTER=<density filter, step={step}, limit={limit}>n'.format(
-            step=step, limit=limit))
+        res.write('##FILTER=<density filter, step={step}, limit={limit}>\n'.format(step=step, limit=limit))
         for line in f:
             if line.startswith('#'):
                 res.write(line)
@@ -110,8 +109,7 @@ def anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf):
           as well as pos with NA dbsnpID. 
     '''
     vcf = pd.read_csv(info_vcf, header=0, sep='\t')
-    cols = ['CHROM', 'POS', 'FS', 'MQ',
-            'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
+    cols = ['CHROM', 'POS', 'FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     vcf = vcf.loc[:, cols]
     dbsnp = pd.read_csv(dbsnp_ID, header=0, sep='\t')
     dbsnp = dbsnp.loc[:, ('CHROM', 'POS', 'BuildID')]
@@ -152,16 +150,34 @@ def anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table):
 
 
 @timethis
-def stat(raw_vcf, anno_dbsnpID, anno_TP_FP, dens_filter):
-    vcf_raw = pd.read_csv(raw_vcf, sep='\t', header=None, comment='#')
-    vcf_identified = pd.read_csv(identified_vcf, sep='\t', header=None, usecols=(0, 1),
+def stat():
+    '''
+    Some stat about Raw vcf and density filter(IF DONE).
+    '''
+    stat = open(stat_file, 'wt', encoding='utf-8')
+    vcf_raw = pd.read_csv(raw_vcf, sep='\t', header=None, comment='#',
+                          names=['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE'])
+    vcf_identified = pd.read_csv(identified_vcf, comment='#', sep='\t', header=None, usecols=(0, 1),
                                  names=['CHROM', 'POS'])
+    # raw recall and precision stat
+    df_tp = pd.merge(vcf_raw, vcf_identified, how='inner', on=['CHROM', 'POS'])
+    tp_num = len(df_tp)
+    fp_num = len(vcf_raw)-len(df_tp)
+    stat.write('Standard SNV Numbers:\t'+str(len(vcf_identified))+'\n')
+    stat.write('RAW SNV Numbers:\t'+str(len(vcf_raw))+'\n')
+    stat.write('Raw TP:\t'+str(tp_num)+'\n')
+    stat.write('RAW Recall:\t{:.2%}\n'.format(tp_num/len(vcf_identified)))
+    stat.write('RAW Precision:\t{:.2%}\n'.format(tp_num/len(vcf_raw)))
+    # stat after density filter
     if dens_filter == 'T':
-        vcf_dens_filtered = pd.read_csv(density_filtered_vcf, sep='\t', header=None,
+        vcf_dens_filtered = pd.read_csv(density_filtered_vcf, sep='\t', comment='#', header=None,
                                         names=['CHROM', 'POS'], usecols=(0, 1))
-        num_density_filtered = pd.merge(vcf_dens_filtered, vcf_identified,
-                                        how='inner', on=['CHROM', 'POS'])
-        print('Density filter Number:t{}'.format(len(vcf_raw)-len(vcf_dens_filtered)))
+        density_filtered_tp = pd.merge(vcf_dens_filtered, vcf_identified,
+                                       how='inner', on=['CHROM', 'POS'])
+        stat.write('Density filtered Number:\t{}\n'.format(len(vcf_raw)-len(vcf_dens_filtered)))
+        stat.write('Density filtered TP Number:\t{}\n'.format(tp_num-len(density_filtered_tp)))
+        stat.write('Density filtered FP Number:\t{}\n'.format(fp_num-(len(vcf_dens_filtered)-len(density_filtered_tp))))
+    stat.close()
 
 
 @timethis
@@ -181,12 +197,14 @@ def main():
         split_info(density_filtered_vcf, info_vcf)
         anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf)
         anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table)
+        stat()
         tmpfiles = [info_vcf, anno_snpID_vcf, density_filtered_vcf]
         rm_tmp(rm, tmpfiles)
     else:
         split_info(raw_vcf, info_vcf)
         anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf)
         anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table)
+        stat()
         tmpfiles = [info_vcf, anno_snpID_vcf]
         rm_tmp(rm, *tmpfiles)
 
@@ -203,7 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('--feature_prefix', '-pref', type=str,
                         help='The output feature table NAME PREFIX of the raw vcf file, Sample ID recommanded. ')
     parser.add_argument("--remove", "-rm", type=str, choices=['T', 'F'], default='F',
-                        help="Remove the TEMP intermediate file or NOT. Default Remove.")
+                        help="Remove the TEMP intermediate file or NOT. Default NOT Remove.")
     parser.add_argument("--density_filter", "-df", type=str, choices=['T', 'F'], default='F',
                         help="Input the Raw VCF file. Default NOT execute density filtering.")
     parser.add_argument("--outdir", "-o", type=str, default='.',
@@ -225,6 +243,7 @@ if __name__ == '__main__':
     dbsnp_ID = args['dbsnpID']
     identified_vcf = args['identified_vcf']
     feature_table = outdir+'/'+args['feature_prefix']+'_features.table'
+    stat_file = outdir+'/'+args['feature_prefix']+'.stat'
     dens_filter = args['density_filter']
 
     main()
