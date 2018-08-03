@@ -54,15 +54,19 @@ def sort_model(tmp, reslut):
     '''
     Sorting the model with different parameters according to accuracy.
     '''
-    with open(tmp, 'r', encoding='utf-8') as f, open(result, 'wt', encoding='utf-8') as res:
+    with open(tmp, 'r', encoding='utf-8') as f, open('tmp2', 'wt', encoding='utf-8') as tmp_f:
+        tmp_f.write(next(f))
         try:
             while True:
                 line = ''
                 for i in range(7):
                     line += next(f).strip()
-                res.write(line+'\n')
+                tmp_f.write(line+'\n')
         except StopIteration:
             pass
+    df = pd.read_csv(tmp2, header=0, sep='\t')
+    df = df.sort_values(by=['mean', 'std'], axis=1, ascending=True)
+    df.to_csv(result, sep='\t', index=0)
 
 
 def main():
@@ -86,27 +90,3 @@ if __name__ == '__main__':
     result = outdir+'/'+prefix+'_model_assess.txt'
 
     main()
-
-# #################### SVF data #########################
-# df = pd.read_csv('HG002_oslo_exome_dbsnp_SNVs.table', sep='\t', header=0)
-# df = df.fillna(0.)
-# df['CLASS'] = df['HG002.BD'].apply(lambda x: int(1) if x == 'TP' else int(0))
-# df = df.drop(['CHROM', 'POS', 'TYPE', 'HG002.BD'], axis=1)
-
-# array = df.values
-# X = array[:, 0:7]
-# Y = array[:, 7]
-
-# validation_size = 0.
-# X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(
-#     X, Y, test_size=validation_size, random_state=6)
-# kfold = model_selection.KFold(n_splits=5, random_state=6)
-
-# models = mlp_classifier()
-# print('model\tstd\tmean')
-# res = open('model_assess.txt', 'wt', encoding='utf-8')
-# for idx, model in enumerate(models):
-#     cv_results = model_selection.cross_val_score(
-#         model, X_train, Y_train.astype(int), cv=kfold, scoring='accuracy')
-#     res.write('{idx}\t{std:0.2%}\t{mean:0.2%}\t{model}\n'.format(
-#         idx=idx, std=cv_results.std(), mean=cv_results.mean(), model=model))
