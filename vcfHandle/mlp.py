@@ -11,8 +11,22 @@ import pandas as pd
 import numpy as np
 import os
 import argparse
+from functools import wraps
 
 
+def timethis(func):
+    ''' Decorator that reports the execution time.'''
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(func.__name__, end-start)
+        return result
+    return wrapper
+
+
+@timethis
 def mlp_classifier():
     '''
     Generating MLPClassifiers with parameters combinations.
@@ -32,6 +46,7 @@ def mlp_classifier():
     return models
 
 
+@timethis
 def preprocessing_features(array, method):
     '''
     features scaling using MinMaxScaler.
@@ -50,6 +65,7 @@ def preprocessing_features(array, method):
     return X_train, X_validation, Y_train, Y_validation
 
 
+@timethis
 def test_model(features, tmp, prep_method):
     '''
     Testing model with different parameters.
@@ -70,6 +86,7 @@ def test_model(features, tmp, prep_method):
     res.close()
 
 
+@timethis
 def sort_model(tmp, reslut):
     '''
     Sorting the model with different parameters according to accuracy.
@@ -90,6 +107,7 @@ def sort_model(tmp, reslut):
     os.remove('tmp2')
 
 
+@timethis
 def main():
     test_model(features, tmp, prep_method)
     sort_model(tmp, result)
