@@ -118,13 +118,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train mlp parameters.")
     parser.add_argument("--train_features", "-tf", type=str, help="Features tables used for trainning model.")
     parser.add_argument("--outdir", '-o', type=str, help="Output directory.")
-    parser.add_argument("--param_prefix", "-pref", type=str, help="Model stat file name prefix.")
+    parser.add_argument("--stat_prefix", "-pref", type=str, help="Model stat file name prefix.")
     parser.add_argument("--preprocessing_features", "-prep", type=str, default="MinMaxScaler", choices=["Standardization", "MinMaxScaler"],
                         help="Preprocessing features method.")
     args = vars(parser.parse_args())
 
     outdir = args['outdir']
-    prefix = args['param_prefix']
+    prefix = args['stat_prefix']
     features = args['train_features']
     prep_method = args['preprocessing_features']
     if not os.path.exists(outdir):
