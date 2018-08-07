@@ -13,6 +13,7 @@ import numpy as np
 import os
 import argparse
 from functools import wraps
+import time
 
 
 def timethis(func):
@@ -128,7 +129,7 @@ if __name__ == '__main__':
     parser.add_argument("--preprocessing_features", "-prep", type=str, default="MinMaxScaler", choices=["Standardization", "MinMaxScaler"],
                         help="Preprocessing features method.")
     parser.add_argument("--alg_param", "-ap", type=str, default="tanh:0.001:10,10,10:lbfgs",
-                        help="Comma seperated list of MLPClassifier algorithm parameters.")
+                        help="Comma seperated list of MLPClassifier algorithm parameters. Default 'tanh:0.001:10,10,10:lbfgs'")
     args = vars(parser.parse_args())
 
     train_features = args["train_features"]
