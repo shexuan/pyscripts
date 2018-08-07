@@ -35,7 +35,7 @@ Notably, density filtering is also alternative in this method.
 
 ```
 Usage:
-python3 data_cleanning.py -raw RAW_vcf -db dbsnp -id identified_vcf -pref output_feature_table_prefix -rm F -df F -o outdir 
+python3 data_preprocess.py -raw RAW_vcf -db dbsnp -id identified_vcf -pref output_feature_table_prefix -rm F -df F -o outdir 
 ```
 Notably, `dbsnp` was the processed dbsnp database file, the file format like this:
 ```
