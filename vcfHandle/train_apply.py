@@ -100,6 +100,7 @@ def stat(result, stats):
     res.write('RAW reacall:\t{:.2%}\n'.format(len(origin_tp)/len(vcf_identified)))
     res.write('RAW precision:\t{:.2%}\n'.format(len(origin_tp)/len(df)))
     res.write('Total SNV Numbers remained after mlp filtered:\t{}\n'.format(len(mlp_t)))
+    res.write('Total TP remained after mlp filtered:\t{}\n'.format(len(mlp_tp)))
     res.write('Precision after mlp filtered:\t{:.2%}\n'.format(precision))
     res.write('Recall after mlp filtered:\t{:.2%}\n'.format(recall))
     res.write('Total SNV Numers of mlp filtered :\t'+str(len(mlp_f))+'\n')
@@ -127,7 +128,7 @@ if __name__ == '__main__':
     parser.add_argument("--prefix", "-pref", type=str,
                         help="Output Result prefix")
     parser.add_argument("--preprocessing_features", "-prep", type=str, default="MinMaxScaler", choices=["Standardization", "MinMaxScaler"],
-                        help="Preprocessing features method.")
+                        help="Preprocessing features method. Default MinMaxScaler")
     parser.add_argument("--alg_param", "-ap", type=str, default="tanh:0.001:10,10,10:lbfgs",
                         help="Comma seperated list of MLPClassifier algorithm parameters. Default 'tanh:0.001:10,10,10:lbfgs'")
     args = vars(parser.parse_args())
