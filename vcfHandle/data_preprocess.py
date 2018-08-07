@@ -112,7 +112,6 @@ def anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf):
     cols = ['CHROM', 'POS', 'FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     vcf = vcf.loc[:, cols]
     dbsnp = pd.read_csv(dbsnp_ID, header=0, sep='\t')
-    dbsnp = dbsnp.loc[:, ('CHROM', 'POS', 'BuildID')]
     # annotate dbsnp BuildID
     vcf_snpID = pd.merge(left=vcf, right=dbsnp,
                          how='left', on=['CHROM', 'POS'])
@@ -195,7 +194,7 @@ def rm_tmp(rm, *tmpfiles):
 @timethis
 def main():
     if dens_filter == 'T':
-        density_filter(raw_vcf, density_filtered_vcf)
+        density_filter(raw_vcf, density_filtered_vcf, step, limit)
         split_info(density_filtered_vcf, info_vcf)
         anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf)
         anno_TP_FP(anno_snpID_vcf, identified_vcf, feature_table)
@@ -224,8 +223,12 @@ if __name__ == '__main__':
                         help='The output feature table NAME PREFIX of the raw vcf file, Sample ID recommanded. ')
     parser.add_argument("--remove", "-rm", type=str, choices=['T', 'F'], default='F',
                         help="Remove the TEMP intermediate file or NOT. Default NOT Remove.")
-    parser.add_argument("--density_filter", "-df", type=str, choices=['T', 'F'], default='F',
+    parser.add_argument("--density_filter", "-df", type=str, choices=['T', 'F'], default='T',
                         help="Input the Raw VCF file. Default NOT execute density filtering.")
+    parser.add_argument("--window", "-w", type=int, default=200,
+                        help="Density filter parameters -- step window. Default 200.")
+    parser.add_argument("--limit", "-l", type=int, default=5,
+                        help="Density filter parameters -- step window. Default 5.")
     parser.add_argument("--outdir", "-o", type=str, default='.',
                         help="Output directory of feature table and TEMP intermediate file.")
 
@@ -247,5 +250,8 @@ if __name__ == '__main__':
     feature_table = outdir+'/'+args['feature_prefix']+'_features.table'
     stat_file = outdir+'/'+args['feature_prefix']+'_densFiltered.stat'
     dens_filter = args['density_filter']
+    if dens_filter == 'T':
+        step = args['window']
+        limit = args['limit']
 
     main()
