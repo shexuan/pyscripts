@@ -177,6 +177,8 @@ def stat():
         stat.write('Density filtered Number:\t{}\n'.format(len(vcf_raw)-len(vcf_dens_filtered)))
         stat.write('Density filtered TP Number:\t{}\n'.format(tp_num-len(density_filtered_tp)))
         stat.write('Density filtered FP Number:\t{}\n'.format(fp_num-(len(vcf_dens_filtered)-len(density_filtered_tp))))
+        stat.write('Recall after Density filtered:\t{:.2%}\n'.format(len(density_filtered_tp)/len(vcf_identified)))
+        stat.write('Precision after Density filtered:\t{:.2%}\n'.format(len(density_filtered_tp)/len(vcf_dens_filtered)))
     stat.close()
 
 
@@ -243,7 +245,7 @@ if __name__ == '__main__':
     dbsnp_ID = args['dbsnpID']
     identified_vcf = args['identified_vcf']
     feature_table = outdir+'/'+args['feature_prefix']+'_features.table'
-    stat_file = outdir+'/'+args['feature_prefix']+'.stat'
+    stat_file = outdir+'/'+args['feature_prefix']+'_densFiltered.stat'
     dens_filter = args['density_filter']
 
     main()
