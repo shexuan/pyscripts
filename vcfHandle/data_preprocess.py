@@ -12,13 +12,6 @@ from functools import wraps
 import time
 
 
-class Algorithm(object):
-    '''
-    Build model with different algorithm.
-    '''
-    pass
-
-
 def timethis(func):
     ''' Decorator that reports the execution time.'''
     @wraps(func)
@@ -109,7 +102,7 @@ def anno_dbsnpID(dbsnp_ID, info_vcf, anno_snpID_vcf):
           as well as pos with NA dbsnpID. 
     '''
     vcf = pd.read_csv(info_vcf, header=0, sep='\t')
-    cols = ['CHROM', 'POS', 'FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
+    cols = ['CHROM', 'POS', 'AF', 'FS', 'MQ', 'MQRankSum', 'QD', 'ReadPosRankSum', 'SOR']
     vcf = vcf.loc[:, cols]
     dbsnp = pd.read_csv(dbsnp_ID, header=0, sep='\t')
     # annotate dbsnp BuildID
@@ -224,7 +217,7 @@ if __name__ == '__main__':
     parser.add_argument("--remove", "-rm", type=str, choices=['T', 'F'], default='F',
                         help="Remove the TEMP intermediate file or NOT. Default NOT Remove.")
     parser.add_argument("--density_filter", "-df", type=str, choices=['T', 'F'], default='T',
-                        help="Input the Raw VCF file. Default NOT execute density filtering.")
+                        help="Input the Raw VCF file. Default execute density filtering.")
     parser.add_argument("--window", "-w", type=int, default=200,
                         help="Density filter parameters -- step window. Default 200.")
     parser.add_argument("--limit", "-l", type=int, default=5,
