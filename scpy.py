@@ -14,28 +14,17 @@ import sys
 import time
 import argparse
 import os
+"/bin/bash", ["-c", cmd]
 
-
-# def ssh_scp_put(local_files,remote_files,ip,user,passwd,port='22'):
-#     ssh = paramiko.SSHClient()
-#     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#     ssh.connect(ip, 22, user, passwd)
-#     a = ssh.exec_command('date')
-#     stdin, stdout, stderr = a
-#     print(stdout.read())
-#     sftp = paramiko.SFTPClient.from_transport(ssh.get_transport())
-#     sftp = ssh.open_sftp()
-#     print(local_files)
-#     print(remote_files)
-#     sftp.put(local_files, remote_files)
 
 def scpy(local_file, user, ip, passwd, remote, types):
     if types == 'file':
         recursive = ''
     if types == 'directory':
         recursive = '-r'
-    child = pexpect.spawn('/bin/bash -c "scp {recursive} {local_file} {user}@{ip}:{remote}"'.format(
-        recursive=recursive, user=user, local_file=local_file, ip=ip, remote=remote))
+    cmd = "scp {recursive} {local_file} {user}@{ip}:{remote}".format(
+        recursive=recursive, user=user, local_file=local_file, ip=ip, remote=remote)
+    child = pexpect.spawn("/bin/bash", ["-c", cmd])
     child.expect(".*password:")
     child.sendline(passwd)
 
