@@ -14,7 +14,6 @@ import sys
 import time
 import argparse
 import os
-"/bin/bash", ["-c", cmd]
 
 
 def scpy(local_file, user, ip, passwd, remote, types):
