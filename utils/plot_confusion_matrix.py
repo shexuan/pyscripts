@@ -3,6 +3,7 @@
 
 
 import matplotlib.pyplot as plt
+import numpy as np
 import itertools
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
@@ -16,14 +17,14 @@ def plot_confusion_matrix(cm, classes, normalize=False,
     Normalization can be applied by setting `normalize=True`. 
     """
     if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
-        print(cm)
+        # print(cm)
     plt.figure(figsize=(20, 20), dpi=100)
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
+    plt.title(title, fontsize=20)
     plt.colorbar()
     labels = []
     if isinstance(classes, dict):
@@ -32,16 +33,16 @@ def plot_confusion_matrix(cm, classes, normalize=False,
     else:
         labels = classes
     tick_marks = np.arange(len(labels))
-    plt.xticks(tick_marks, labels, rotation=45, fontsize=18)
+    plt.xticks(tick_marks, labels, rotation=90, fontsize=18)
     plt.yticks(tick_marks, labels, fontsize=18)
     plt.ylim(tick_marks[-1]+0.5, tick_marks[0]-0.5)
     fmt = '.2f' if normalize else 'd'
     thresh = cm.max() / 2.
     print(thresh)
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
+        plt.text(j, i, format(cm[i, j], 'd')+'\n'+format(cm_norm[i, j], '.2f'),
                  horizontalalignment="center",
-                 color="red" if cm[i, j] > thresh else "black",
+                 color="pink" if cm[i, j] > thresh else "black",
                  fontsize=16)
     plt.tight_layout()
     plt.ylabel('True label', fontsize=20)
@@ -49,8 +50,9 @@ def plot_confusion_matrix(cm, classes, normalize=False,
 
 
 if __name__ == '__main__':
+    df = {'label': np.random.randint(2, size=100),
+          'prediction': np.random.randint(2, size=100)}
+
+    cf_matrix = confusion_matrix(y_true=df['label'], y_pred=df['prediction'])
     classes = {0: 'dog', 1: 'cat'}
-    y_true = [0, 1, 0, 1]
-    y_pred = [0, 0, 1, 1]
-    cm = confusion_matrix(y_true=y_true, y_pred=y_pred)
-    plot_confusion_matrix(cm, classes)
+    plot_confusion_matrix(cf_matrix, classes, normalize=True)
